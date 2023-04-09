@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os,re,argparse
 import codecs
 import numpy as np
@@ -35,13 +36,13 @@ def get_root_path():
 	root_path = ""
 	for folder in pathfolders:
 		try:
-			if ("dbscan-swa.py" in os.listdir(folder)) and ('makeblastdb' in os.listdir(folder)):
+			if ("dbscan-swa.py" in os.listdir(folder)):
 				root_path = os.path.dirname(folder)
 				break
 		except:
 			pass
 	try:
-		if root_path == "" and os.sep in sys.argv[0] and "dbscan-swa.py" in os.listdir(sys.argv[0].rpartition(os.sep)[0]) and "makeblastdb" in os.listdir(sys.argv[0].rpartition(os.sep)[0]):
+		if root_path == "" and os.sep in sys.argv[0] and "dbscan-swa.py" in os.listdir(sys.argv[0].rpartition(os.sep)[0]):
 			root_path = os.path.dirname(sys.argv[0].rpartition(os.sep)[0])
 			#os.chdir(root_path)
 	except:
@@ -381,36 +382,27 @@ def GetFaaSequenc(fileName,saveFaaPath,prefix,add_genome_id='no'):   #parse spec
 
 def diamond_blastp(file,outfile,database,format,evalue,diamond_thread_num=20):
 	#num_threads = 20
-	diamond_path = os.path.join(root_path,'software','diamond','diamond') 
-	script = diamond_path+" blastp -d "+database+" -q "+file+" -f "+str(format)+" -e "+str(evalue)+" -o "+outfile+" -p "+str(diamond_thread_num)+" --max-target-seqs 1"
+	script = "diamond blastp -d "+database+" -q "+file+" -f "+str(format)+" -e "+str(evalue)+" -o "+outfile+" -p "+str(diamond_thread_num)+" --max-target-seqs 1"
 	print(script)
 	os.system(script)
 
 def blastp(file,outfile,database,format,evalue):
-	num_threads = 20
-	blastp_path = os.path.join(root_path,'software','blast+','blastp') 
-	script = blastp_path+" -db "+database+" -query "+file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -num_threads "+str(num_threads)+" -max_target_seqs 1"
+	script = "blastp -db "+database+" -query "+file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -num_threads "+str(thread_num)+" -max_target_seqs 1"
 
 	os.system(script)
 
 def blastn(file,outfile,database,format,evalue):
-	num_threads = 20
 	format = 0
-	blastn_path = os.path.join(root_path,'software','blast+','blastn')
-	script = blastn_path+" -db "+database+" -query "+file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -num_threads "+str(num_threads)+" -num_alignments 1 -word_size 11"
+	script = "blastn -db "+database+" -query "+file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -num_threads "+str(thread_num)+" -num_alignments 1 -word_size 11"
 	os.system(script)
 
 def blastn_file(file,outfile,subject_file,format,evalue):
-	num_threads = 20
 	format = 0
-	blastn_path = os.path.join(root_path,'software','blast+','blastn')
-	script = blastn_path+" -subject "+subject_file+" -query "+file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -word_size 11"
+	script = "blastn -subject "+subject_file+" -query "+file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -word_size 11"
 	print(script)
 	os.system(script)
 
 def blastp_file(file,outfile,subject_file,format,evalue):
-	num_threads = 20
-	blastp_path = os.path.join(root_path,'software','blast+','blastp')
 	script = "blastp -subject "+subject_file+" -query "+file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -max_target_seqs 1"
 	os.system(script)
 
@@ -1515,40 +1507,33 @@ def bac_blastn_phagedb(prophage_file,outfile):
 	phage_database = os.path.join(root_path,'db','database','phage_nucl','phage_nucl_db')
 	format = 6
 	evalue = 0.01
-	blastn_path = os.path.join(root_path,'software','blast+','blastn')
-	script = blastn_path+" -db "+phage_database+" -query "+prophage_file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -num_threads 20 -word_size 11 -perc_identity 70 -reward 1 -penalty -2 -gapopen 0 -gapextend 0 -max_target_seqs 1000000"
+	script = "blastn -db "+phage_database+" -query "+prophage_file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -num_threads" + str(thread_num) + " -word_size 11 -perc_identity 70 -reward 1 -penalty -2 -gapopen 0 -gapextend 0 -max_target_seqs 1000000"
 	os.system(script)
 
 def bac_blastn_phage(prophage_file,phage_file,outfile):
 	format = 6
 	evalue = 0.01
-	blastn_path = os.path.join(root_path,'software','blast+','blastn')
-	command = blastn_path+" -query "+prophage_file+" -subject "+phage_file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -word_size 11 -perc_identity 70 -reward 1 -penalty -2 -gapopen 0 -gapextend 0"
+	command = "blastn -query "+prophage_file+" -subject "+phage_file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile+" -word_size 11 -perc_identity 70 -reward 1 -penalty -2 -gapopen 0 -gapextend 0"
 	print(command)
 	os.system(command)
 
 def diamond_blastp_nomax(file,outfile,database):
-	num_threads = 20
 	format = 6
 	evalue = 1
 	identity = 0.4
 	coverage = 0.7
-	diamond_path = os.path.join(root_path,'software','diamond','diamond')
-	script = diamond_path+" blastp -d "+database+" -q "+file+" -f "+str(format)+" -e "+str(evalue)+" -o "+outfile+" -p "+str(num_threads)+" --id "+str(identity)+" --query-cover "+str(coverage)+" -k 1000000"
+	script = "diamond blastp -d "+database+" -q "+file+" -f "+str(format)+" -e "+str(evalue)+" -o "+outfile+" -p "+str(diamond_thread_num)+" --id "+str(identity)+" --query-cover "+str(coverage)+" -k 1000000"
 	os.system(script)
 
 def bac_blastp_phagedb(prophage_file,outfile):
-	num_threads = 20
 	format = 6
 	database = os.path.join(root_path,'db','database','phage_protein_db')
 	diamond_blastp_nomax(prophage_file,outfile,database)
 
 def bac_blastp_phage(prophage_file,phage_file,outfile):
-	num_threads = 20
 	evalue = 0.01
 	format = 6
-	blastp_path = os.path.join(root_path,'software','blast+','blastp')
-	command = blastp_path+" -query "+prophage_file+" -subject "+phage_file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile
+	command = "blastp -query "+prophage_file+" -subject "+phage_file+" -outfmt "+str(format)+" -evalue "+str(evalue)+" -out "+outfile
 	print(command)
 	os.system(command)
 
@@ -2753,7 +2738,7 @@ if __name__=='__main__':
 		cov = args.cov
 	else:
 		cov = 30
-	thread_num = 10
+	global thread_num = 10
 	if args.thread_num:
 		thread_num = args.thread_num
 	else:
