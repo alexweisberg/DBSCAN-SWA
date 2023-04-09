@@ -2738,7 +2738,8 @@ if __name__=='__main__':
 		cov = args.cov
 	else:
 		cov = 30
-	global thread_num = 10
+	global thread_num
+	thread_num = 10
 	if args.thread_num:
 		thread_num = args.thread_num
 	else:
